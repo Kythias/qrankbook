@@ -129,11 +129,9 @@ export default {
     },
     updateInitials () {
       this.onFiltered()
-      console.log("Meteor filtered called.")
       return
     },
     updateLists () {
-      console.log("Update lists called")
       this.listMaster = this.records
       return
     }
@@ -171,11 +169,9 @@ export default {
     onFiltered() {
       this.sumTime = this.sumShowingTime()
       this.totalDeaths = this.sumShowingDeaths()
-      console.log(...this.filterOn)
     },
     categoryChecks(row, criteria) {
       if (criteria.series && criteria.series != row.SERIES) {
-          console.log("Series mismatch " + criteria.series + " and " + row.SERIES);
           return false
         } else {
           return true
@@ -189,22 +185,19 @@ export default {
         let titleMatch = row.TITLE.match(regexTest)
 
         if (titleMatch < 1) {
-          console.log(regexTest + " no match " + row.TITLE);
           return false
         } else {
-          console.log(row.TITLE + " entered series check after correct title match")
           return this.categoryChecks(row, criteria)
         }
       } else {
-        console.log(row.TITLE + " entered series check after no title entered")
         return this.categoryChecks(row, criteria)
       }
     }
   },
   computed: {
     seriesList () {
-      console.log("Computational stuff happening...")
-      return [...new Set(this.records.map(item => item.SERIES))]
+      let seriesSet = this.records.map(item => item.SERIES)
+      return seriesSet.filter((a, i, aa) => aa.indexOf(a) === i && aa.lastIndexOf(a) !== i).sort()
     }
   }
 }
