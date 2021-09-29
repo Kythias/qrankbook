@@ -3,6 +3,7 @@
     <h2>RANKINGS</h2>
     <p>Total Deaths on Games Shown: {{totalDeaths}}</p>
     <p>Total Time Spend on Games Shown: {{sumTime}}</p>
+    
     <b-input-group>
       <b-form-select v-model="filter.series" :options="seriesList">
         <template #first><b-form-select-option :value="null" disabled>-- Choose a Series --</b-form-select-option></template>
@@ -11,25 +12,49 @@
         <b-button variant="primary" :disabled="!filter.series" @click="filter.series = null">Clear</b-button>
       </b-input-group-append>
     </b-input-group>
+    
+    <b-input-group>
+      <b-form-select v-model="filter.platform" :options="platformList">
+        <template #first><b-form-select-option :value="null" disabled>-- Choose a Platform --</b-form-select-option></template>
+      </b-form-select>
+      <b-input-group-append>
+        <b-button variant="primary" :disabled="!filter.platform" @click="filter.platform = null">Clear</b-button>
+      </b-input-group-append>
+    </b-input-group>
+    
+    <b-input-group>
+      <b-form-select v-model="filter.developer" :options="developerList">
+        <template #first><b-form-select-option :value="null" disabled>-- Choose a Developer --</b-form-select-option></template>
+      </b-form-select>
+      <b-input-group-append>
+        <b-button variant="primary" :disabled="!filter.developer" @click="filter.developer = null">Clear</b-button>
+      </b-input-group-append>
+    </b-input-group>
+    
+    <b-input-group>
+      <b-form-select v-model="filter.publisher" :options="publisherList">
+        <template #first><b-form-select-option :value="null" disabled>-- Choose a Publisher --</b-form-select-option></template>
+      </b-form-select>
+      <b-input-group-append>
+        <b-button variant="primary" :disabled="!filter.publisher" @click="filter.publisher = null">Clear</b-button>
+      </b-input-group-append>
+    </b-input-group>
+    
+    <b-input-group>
+      <b-form-select v-model="filter.genre" :options="genreList">
+        <template #first><b-form-select-option :value="null" disabled>-- Choose a Genre --</b-form-select-option></template>
+      </b-form-select>
+      <b-input-group-append>
+        <b-button variant="primary" :disabled="!filter.genre" @click="filter.genre = null">Clear</b-button>
+      </b-input-group-append>
+    </b-input-group>
+    
     <b-input-group>
       <b-form-input type="search" v-model="filter.title" name="filter" placeholder="Search the records..."/>
           <b-input-group-append>
-            <b-button variant="primary" :disabled="!filter" @click="filter.title = ''">Clear</b-button>
+            <b-button variant="primary" :disabled="!filter.title" @click="filter.title = ''">Clear</b-button>
           </b-input-group-append>
     </b-input-group>
-    <b-form-checkbox-group
-      v-model="filterOn"
-      :options="options"
-    >
-
-    </b-form-checkbox-group>
-    <!-- <b-form-group>
-      <b-form-radio-group
-        v-model="filterOn"
-        :options="options"
-        name="inline-radio"
-      ></b-form-radio-group>
-    </b-form-group> -->
   <div id="table-holder" class="container-fluid">
     <b-table striped v-model="showing" :items="records" :fields="fields" :small="true" :filter="filter" :filter-function="deepFilter" @filtered="onFiltered"></b-table>
   </div>
@@ -101,19 +126,17 @@ export default {
       url: "",
       filter: {
         title: "",
-        series: null,  
+        series: null,
+        platform: null,
+        developer: null,
+        publisher: null,
+        genre: null  
       },
       filterOn: [],
       options: [ ['TITLE'], ['SERIES'], ['PLATFORM'], ['DEVELOPER'], ['PUBLISHER'], ['GENRE']],
       showing: [],
       totalDeaths: 0,
-      sumTime: 0,
-      platformList: [],
-      devList: [],
-      publisherList: [],
-      genreList: [],
-      listMaster: [],
-      seriesSelected: null,
+      sumTime: 0
     }
   },
   meteor: {
@@ -173,9 +196,17 @@ export default {
     categoryChecks(row, criteria) {
       if (criteria.series && criteria.series != row.SERIES) {
           return false
-        } else {
+      } else if (criteria.platform && criteria.platform != row.PLATFORM) {
+         return false
+      } else if (criteria.developer && criteria.developer != row.DEVELOPER) { 
+          return false
+      } else if (criteria.publisher && criteria.publisher != row.PUBLISHER) {
+          return false
+      } else if (criteria.genre && criteria.genre != row.GENRE) {
+          return false
+      } else {
           return true
-        }
+      }
     },
     deepFilter(row, criteria) {
 
@@ -198,6 +229,18 @@ export default {
     seriesList () {
       let seriesSet = this.records.map(item => item.SERIES)
       return seriesSet.filter((a, i, aa) => aa.indexOf(a) === i && aa.lastIndexOf(a) !== i).sort()
+    },
+    platformList () {
+      return [...new Set(this.records.map(item => item.PLATFORM))].sort()
+    },
+    developerList () {
+      return [...new Set(this.records.map(item => item.DEVELOPER))].sort()
+    },
+    publisherList () {
+      return [...new Set(this.records.map(item => item.PUBLISHER))].sort()
+    },
+    genreList () {
+      return [...new Set(this.records.map(item => item.GENRE))].sort()
     }
   }
 }
